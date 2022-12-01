@@ -9,6 +9,44 @@ bool compareName(char str[],char str2[])
 	return strcasecmp(str,str2) < 0;
 }
 
+bool validarCorreo(char str[])
+{
+	char aux[20];
+	bool confirm = false;
+
+	//determinar que tenga una @
+	for (int i = 0; i < strlen(str); i++)
+	{	
+
+		//comparamos si el arroba existe en la cadena y tambien
+		//comparamos si el arroba no esta en la ultima posicion de la cadena
+		if (str[i] == '@' && i != (strlen(str) - 1))// -2 porque tiene un salto de linea
+		{
+			confirm = true;
+		} 
+	}
+
+	// si confirm es false significa que la cadena no tiene arroba
+	if (confirm)
+	{
+		strcpy(aux,strtok(str,"@"));//separamos la cadena del arroba
+		strcpy(aux,strtok(NULL,"\n"));//ahora copiamos la cadena y le quitamos el salto de linea
+
+		if (
+			(strcasecmp(aux,"gmail.com")   != 0)  && (strcasecmp(aux,"hotmail.com") != 0 ) && 
+			(strcasecmp(aux,"hotmail.es")  != 0)  && (strcasecmp(aux,"outlook.es" ) != 0 ) &&
+			(strcasecmp(aux,"outlook.com") != 0)  
+	   		)
+		{
+			return false;
+		}
+
+	} else
+		return false;
+
+	return true;	
+}
+
 bool only_numbers(char str[])
 {
 
@@ -60,16 +98,24 @@ bool validPhone(char phone[])
 
 	char aux[30];//cadena auxiliar para comparar que sea un numero valido
 
+	//comparamos que sea un numero personal y no un numero de hogar
 	/*
-	strcnpy(aux,phone,4);//tomaremos los primeros cuatro digitos de la cadena
-
-	if (strcmp(aux,"0424") != 0)
-		return false;
-	else if (strcmp(aux,"0426") != 0)
-		return false;
-	else if (strcmp(aux,"0412") != 0)
+	strncpy(aux,phone,2);//tomamos los primeros 2 digitos
+	aux[strlen(aux)] = '\0';
+	cout << "\n" << aux;
+	if (strcmp(aux,"02") == 0)
 		return false;
 	*/
+
+	//comparamos que el codigo sea uno registrado en el pais
+	strncpy(aux,phone,4);//tomaremos los primeros cuatro digitos de la cadena
+	aux[4] = '\0';
+
+
+	if ((strcmp(aux,"0424") != 0) && (strcmp(aux,"0426") != 0) 
+	 && (strcmp(aux,"0412") != 0) && (strcmp(aux,"0414") != 0))
+		return false;
+		
 	return true;
 }	
 
@@ -78,6 +124,7 @@ void agregarDatos(Datos &p)
 {
 
 	char opcion[10];
+	char aux[40];
 
 	cout << "\n\n Como desea nombrar el contacto: ";
 	cin.getline(p.name,30,'\n');
@@ -105,11 +152,23 @@ void agregarDatos(Datos &p)
 	
 
 	if(opcion[0] == 's'){
-		//do{
+		do{
 			cout << "\n\n Ingrese el correo: ";
 			cin.getline(p.mail,30,'\n');
+
+			strcpy(aux,p.mail);//copiamos la cadena para no afectar la original
+
 			fflush(stdin);
-		//}while()
+
+			if (!validarCorreo(aux))
+			{
+				cout << "\n\n Correo invalido intente de nuevo\n";
+				system("pause");
+			}
+
+			strcpy(aux,p.mail);//copiamos de nuevo ya que anteriormente se modifico el axuiliar
+			
+		}while(!validarCorreo(aux));
 	} 
 	else 
 		strcpy(p.mail,"No asignado");
@@ -186,12 +245,122 @@ void Delete(Nodo *&lista, char name[])
 	}
 }
 
+void saveEdit(char phone[], char mail[], char name[], Datos &p)
+{	
+
+	char opcion[30];
+	char aux[30];
+	
+
+	do{
+		cls;
+		cout << "\n\n Editando datos del contacto \n\n";
+
+		cout << "\n\n Datos de "<< name;
+		cout << "\n Telefono: "<<phone;
+		cout << "\n Correo: "<<mail;
+
+		cout << "\n\n Que desea editar?\n\n";
+		cout << "\n t -> telefono";
+		cout << "\n n -> nombre";
+		cout << "\n c -> correo";
+		cout << "\n a -> todos los datos";
+
+		do{
+
+			cout << "\n Ingresar: ";
+			cin.getline(opcion,30,'\n');
+
+			if (opcion[0] != 't' && opcion[0] != 'c' && opcion[0] != 'n' && opcion[0] != 'a')
+			{
+				cout << "\n\n opcion incorrecta. intente de nuevo";
+				system("pause");
+			}
+
+		}while(opcion[0] != 't' && opcion[0] != 'c' && opcion[0] != 'n' && opcion[0] != 'a');
+
+		//guardamos los datos previamente 
+		strcpy(p.name,name);
+		strcpy(p.phone,phone);
+		strcpy(p.mail,mail);
+
+		switch(opcion[0])
+		{
+			case 't':
+				
+				do{
+
+					cout << "\n\n Ingrese el nuevo telefono: ";
+					cin.getline(p.phone,30,'\n');
+					fflush(stdin);
+					if(!validPhone(p.phone))
+					{
+						cout << "\n\n Numero de telefono invalido. intente de nuevo\n\n";
+						system("pause");
+					}
+
+					//guardamos los datos de nuevo para que se copien los nuevos datos ingresados
+					strcpy(phone,p.phone);
+
+				}while(!validPhone(p.phone));
+
+				break;
+
+			case 'n':
+
+				cout << "\n\n Ingrese el nuevo nombre: ";
+				cin.getline(p.name,30,'\n');
+				strcpy(name,p.name);
+				break;
+
+			case 'c':
+
+				do{
+					cout << "\n\n Ingrese el nuevo correo: ";
+					cin.getline(p.mail,30,'\n');
+
+					strcpy(aux,p.mail);//copiamos la cadena para no afectar la original
+
+					fflush(stdin);
+
+					if (!validarCorreo(aux))
+					{
+						cout << "\n\n Correo invalido intente de nuevo\n";
+						system("pause");
+					}
+
+					strcpy(aux,p.mail);//copiamos de nuevo ya que anteriormente se modifico el axuiliar
+					strcpy(mail,p.mail);
+
+				}while(!validarCorreo(aux));
+
+				break;
+
+			case 'a':
+
+				agregarDatos(p);
+		}
+
+		cls;
+
+		cout << "\n\n Desea editar otro atributo?";
+		cout << "\n s -> si";
+		cout << "\n otro -> no";
+		cout << "\n Ingresar: ";
+		cin.getline(opcion,30,'\n');
+
+	}while(opcion[0] == 's');
+	
+}
 
 void edit(Nodo *&lista, Datos &p)
 {	
 
 	Nodo *aux = lista;
 
+	char name_aux[40];
+	char phone_aux[40];
+	char mail_aux[40];
 	char user_request[30];
 
 	do{
@@ -206,9 +375,15 @@ void edit(Nodo *&lista, Datos &p)
 			if (strcasecmp(user_request,aux->persona.name) == 0)
 			{	
 
+				//copiamos los datos para luego editarlos
+				strcpy(name_aux,aux->persona.name);
+				strcpy(phone_aux,aux->persona.phone);
+				strcpy(mail_aux,aux->persona.mail);
+				
+
 				Delete(lista,user_request);
-				cout << "\n\n Editando datos del contacto \n\n";
-				agregarDatos(p);
+				saveEdit(phone_aux,mail_aux,name_aux,p);
+				
 				fflush(stdin);
 				agregarNodo(lista,p);
 				//ordenar(lista,aux->persona,aux);
@@ -223,7 +398,7 @@ void edit(Nodo *&lista, Datos &p)
 
 			cout << "\n\n Que desea hacer?\n\n";
 			cout << "\n e -> editar un contacto";
-			cout << "\n otro -> salir";
+			cout << "\n otro -> volvera al menu";
 			cout << "\n Ingresar: ";
 			cin.getline(opcion,10,'\n');
 			
@@ -234,7 +409,7 @@ void edit(Nodo *&lista, Datos &p)
 
 			cout << "\n\n Que desea hacer?\n\n";
 			cout << "\n e -> editar otro contacto";
-			cout << "\n otro -> salir";
+			cout << "\n otro -> volvera al menu";
 			cout << "\n Ingresar: ";
 			cin.getline(opcion,10,'\n');
 		}
@@ -256,70 +431,157 @@ void deleteAll(Nodo *& lista)
 	}
 }
 
-void search(Nodo *lista,Datos p)
+void search(Nodo *&lista,Datos p)
 {	
 
 	cls;
 	char sub_search_name[30];
 	char sub_search_phone[30];
-	char user_request[30];	
+	char user_request[30], str_delete[100];	
 	char to_search_name[30],to_search_phone[30];
-	int cont   = 0;
-	Nodo *aux  = lista;
+	bool found = false;
+	int  cont;
+	Nodo *aux;
 
-	cout << "\n\n\t Menu de Busqueda \n\n\n";
+	do{
 
-	cout << "\n Ingrese el nombre o telefono a buscar: ";
+		cont = 0;
+		aux = lista;
 
-	cin.getline(user_request,30,'\n');
+		cout << "\n\n\t Menu de Busqueda \n\n\n";
 
-	cout << "\n\n Mejores coincidencias \n\n\n";
+		cout << "\n Ingrese el nombre o telefono a buscar: ";
 
-	//spaceAndPrintr("Nombre",16);     cout <<      " |  ";
-	//spaceAndPrintr("telefono",13);	 cout <<   "| \n\n";	
+		cin.getline(user_request,30,'\n');
 
-	while(aux != NULL)
-	{	
+		cout << "\n\n Mejores coincidencias \n\n\n";
 
-		//guardamos el nombre y el telefono de la persona actual	
-		strcpy(to_search_name,aux->persona.name);
-		strcpy(to_search_phone,aux->persona.phone);
+		//spaceAndPrintr("Nombre",16);     cout <<      " |  ";
+		//spaceAndPrintr("telefono",13);	 cout <<   "| \n\n";	
 
-		//separamos la cadena determinado por el numero de caracteres ingresado por el usuario
-		strncpy(sub_search_name, to_search_name, strlen(user_request));
-		strncpy(sub_search_phone, to_search_phone, strlen(user_request));
+		while(aux != NULL)
+		{	
 
-		sub_search_phone[strlen(user_request)] = '\0';
-		sub_search_name[strlen(user_request)] = '\0';
+			//guardamos el nombre y el telefono de la persona actual	
+			strcpy(to_search_name,aux->persona.name);
+			strcpy(to_search_phone,aux->persona.phone);
+
+			//separamos la cadena determinado por el numero de caracteres ingresado por el usuario
+			strncpy(sub_search_name, to_search_name, strlen(user_request));
+			strncpy(sub_search_phone, to_search_phone, strlen(user_request));
+
+			sub_search_phone[strlen(user_request)] = '\0';
+			sub_search_name[strlen(user_request)]  = '\0';
+			//eliminamos el elemento basura que se almacena al final
 
 		
-		if ((strcasecmp(sub_search_name,user_request)) == 0 || 
-		    (strcmp(sub_search_phone,user_request)  == 0))
-		{
-			cont++;
-			mostrarDatos(aux -> persona,cont);
-			foundF = true;
-			cout <<"\n";
+			if ((strcasecmp(sub_search_name,user_request)) == 0 || 
+		    	(strcmp(sub_search_phone,user_request)  == 0))
+			{
+				cont++;
+				mostrarDatos(aux -> persona,cont);
+				foundF = true;
+				cout <<"\n";
+			}
+
+			aux = aux -> siguiente;
+		
 		}
 
-		aux = aux -> siguiente;
+		if (!foundF)
+			cout << "\n\n Ningun elemento encontrado \n\n";
+		else
+		{
 		
-	}
+			cout << "\n\n Que desea hacer?\n\n";
+			cout << "\n e -> editar un contacto";
+			cout << "\n d -> eliminar un contacto";
+			cout << "\n otro -> salir";
+			cout << "\n Ingresar: ";
+			cin.getline(opcion,10,'\n');
 
-	if (!foundF)
-		cout << "\n\n Ningun elemento encontrado \n\n";
-	else
-	{
-		
-		cout << "\n\n Que desea hacer?\n\n";
-		cout << "\n e -> editar un contacto";
-		cout << "\n otro -> salir";
+			if (opcion[0] == 'e')
+				edit(lista,p);
+
+			else if (opcion[0] == 'd')
+			{
+				do{
+					cout << "\n\n Ingrese exactamente el nombre del contacto a eliminar: ";
+					cin.getline(str_delete,100,'\n');
+
+					//buscamos si hay alguna coincidencia
+					aux = lista;//devolvemos el auxiliar al inicio de la lista
+					while(aux != NULL)
+					{			
+
+						if (strcasecmp(str_delete,aux->persona.name) == 0)
+						{
+							found = true;
+							break;
+						}
+
+						aux = aux -> siguiente;
+
+					}
+
+			
+					if (!found)
+					{	
+
+										
+						cout << "\n\n Nombre incorrecto \n";
+						cout << "\n Desea ingresar el nombre de nuevo?";
+						cout << "\n s -> si";
+						cout << "\n n -> cancelar operacion (Volvera al menu)";
+
+
+						do{
+							cout << "\n Ingresar: ";
+							cin.getline(opcion,10,'\n');
+
+							if (opcion[0] != 's' && opcion[0] != 'n')
+								cout << "\n\n Opcion incorrecta. intente de nuevo \n\n";
+
+						}while(opcion[0] != 's' && opcion[0] != 'n');
+
+					} else {
+
+
+						cout << "\n Seguro que quiere eliminarlo?";	
+						cout << "\n s -> si";
+						cout << "\n n -> cancelar operacion";
+										
+						do{
+							cout << "\n Ingresar: ";
+							cin.getline(opcion,10,'\n');
+
+							if (opcion[0] != 's' && opcion[0] != 'n')
+								cout << "\n\n Opcion incorrecta. intente de nuevo \n\n";
+
+						}while(opcion[0] != 's' && opcion[0] != 'n');
+
+
+						if (opcion[0] == 's')
+						{
+							Delete(lista,str_delete);
+							opcion[0] = 'c';
+						}
+
+					}
+					
+					cls;
+				}while(opcion[0] == 's');
+			}
+
+			cls;
+		}
+
+
+		cout << "\n\n Desea buscar de nuevo?";
+		cout << "\n s -> si ";
+		cout << "\n otro -> volver al menu";
 		cout << "\n Ingresar: ";
 		cin.getline(opcion,10,'\n');
-
-		if (opcion[0] == 'e')
-			edit(lista,p);
-		
-	}
-
+		cls;
+	}while(opcion[0] == 's');
 }

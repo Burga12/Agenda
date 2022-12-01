@@ -43,6 +43,7 @@ void mostrarDatos(Datos aux,int n);
 void Delete(Nodo *&lista, char name[]);
 void edit(Nodo *&lista, Datos &p);
 void deleteAll(Nodo *& lista);
-void search(Nodo *lista,Datos p);
+void search(Nodo *&lista,Datos p);
+bool validarCorreo(char str[]);
 
 #endif

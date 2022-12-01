@@ -91,23 +91,15 @@ int main(int argc, char const *argv[])
 					
 				do{
 
-					do{
-
-						cout << "\n\t Eliminar contacto \n\n";
-						cout << "\n u -> Eliminar un solo contacto";
-						cout << "\n a -> Eliminar todos los contactos";
-						cout << "\n o -> Salir del programa";
-						cout << "\n Otro -> volver al menu";
-						cout << "\n Ingresar: ";
-						cin.getline(opcion,10,'\n');
-
-						if (opcion[0] != 'u' && opcion[0] != 'a' && opcion[0] != 'o')
-						{
-							cout << "\n\n Opcion incorrecta. intente de nuevo \n\n";
-							system("pause");
-						}
-						
-					}while(opcion[0] != 'u' && opcion[0] != 'a' && opcion[0] != 'o');
+					
+					cls;
+					cout << "\n\t Eliminar contacto \n\n";
+					cout << "\n u -> Eliminar un solo contacto";
+					cout << "\n a -> Eliminar todos los contactos";
+					cout << "\n o -> Salir del programa";
+					cout << "\n Otro -> volver al menu";
+					cout << "\n Ingresar: ";
+					cin.getline(opcion,10,'\n');
 					
 					switch(opcion[0])
 					{
@@ -133,7 +125,7 @@ int main(int argc, char const *argv[])
 
 								if (str_delete[0] != '0')
 								{
-									aux = lista;//devolvemos aux al primer nodo
+									aux = lista;//devolvemos aux al inicio de la lista
 
 									while(aux != NULL)
 									{			
@@ -202,14 +194,21 @@ int main(int argc, char const *argv[])
 
 									cout << "\n Operacion cancelada \n\n";
 
-									cout << "\n Desea eliminar otro contacto?";
+									cout << "\n Desea intentarlo de nuevo?";
 									cout << "\n s -> si";
 									cout << "\n otro -> Volver al menu";
 									cout << "\n o -> Salir del programa";
 									cout << "\n Ingresar: ";
 									cin.getline(opcion,10,'\n');
 								}
-							
+								
+								if (lista == NULL){
+									cls;
+									cout << "\n Lista vacia";
+									cout << "\n Volviendo al menu\n\n";
+									sleep(2);
+									opcion[0] = 'b';
+								}
 							}while(opcion[0] == 's');
 				
 							cout<<endl<<endl;
@@ -228,8 +227,14 @@ int main(int argc, char const *argv[])
 							cout << "\n Seguro que quiere eliminarlo todos los contactos?";
 							cout << "\n s -> si";
 							cout << "\n n -> no (volvera al menu)";
-							cout << "\n Ingresar: ";
-							cin.getline(opcion,10,'\n');
+							do{
+								cout << "\n Ingresar: ";
+								cin.getline(opcion,10,'\n');
+
+								if (opcion[0] != 's' && opcion[0] != 'n' && opcion[0] != 'o')
+									cout << "\n\n Opcion incorrecta. intente de nuevo \n\n";
+
+							}while(opcion[0] != 's' && opcion[0] != 'n' && opcion[0] != 'o');
 
 
 							if (opcion[0] == 's')
